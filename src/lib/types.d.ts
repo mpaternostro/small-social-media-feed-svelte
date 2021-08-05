@@ -12,3 +12,9 @@ export interface Post {
 	createdAt: Date;
 	content: string;
 }
+
+export interface User {
+	name: string;
+	username: string;
+	createdAt: Date;
+}
