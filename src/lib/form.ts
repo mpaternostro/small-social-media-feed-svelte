@@ -1,5 +1,14 @@
 // this action (https://svelte.dev/tutorial/actions) allows us to
 // progressively enhance a <form> that already works without JS
+
+import type { User } from './types';
+
+interface ServerResponse extends Response {
+	json: () => Promise<{
+		user: User | undefined;
+	}>;
+}
+
 export function enhance(
 	form: HTMLFormElement,
 	{
@@ -9,7 +18,7 @@ export function enhance(
 	}: {
 		pending?: (data: FormData, form: HTMLFormElement) => void;
 		error?: (res: Response, error: Error, form: HTMLFormElement) => void;
-		result: (res: Response, form: HTMLFormElement) => void;
+		result: (res: ServerResponse, form: HTMLFormElement) => void;
 	}
 ) {
 	let current_token: {};

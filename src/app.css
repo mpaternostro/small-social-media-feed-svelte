@@ -10,6 +10,11 @@
 	--text-color: #444444;
 	--background-without-opacity: rgba(255, 255, 255, 0.7);
 	--gray-background: #f5f5f5;
+	--light-emerald: #00d1b2;
+	--emerald: #00d1b2;
+	--dark-emerald: #00b89c;
+	--blue: #3273dc;
+	--dark-blue: #276cda;
 	--column-width: 42rem;
 	--column-margin-top: 4rem;
 }

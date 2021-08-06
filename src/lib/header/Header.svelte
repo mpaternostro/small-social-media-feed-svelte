@@ -14,7 +14,7 @@
 
 <style>
 	header {
-		background-color: #00d1b2;
+		background-color: var(--emerald);
 	}
 
 	ul {
@@ -35,7 +35,7 @@
 	}
 
 	li:hover {
-		background-color: #00b89c;
+		background-color: var(--dark-emerald);
 	}
 
 	a {
