@@ -1,3 +1,5 @@
+import type { LoadInput } from '@sveltejs/kit';
+
 /**
  * Can be made globally available by placing this
  * inside `global.d.ts` and removing `export` keyword
@@ -7,8 +9,9 @@ export interface Locals {
 }
 
 export interface Post {
+	id: string;
 	title: string;
-	author: string;
+	userId: string;
 	createdAt: Date;
 	content: string;
 }

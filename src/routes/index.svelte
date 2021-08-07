@@ -1,55 +1,137 @@
 <script context="module" lang="ts">
 	import type { Load } from '@sveltejs/kit';
+	import type { CustomLoadInput } from '$lib/types';
 	import { myFormStore } from '$lib/stores';
 
-	// see https://kit.svelte.dev/docs#loading
-	export const load: Load = async ({ fetch }) => {
-		// const res = await fetch('/posts.json');
+	async function loadUsers({ fetch }: CustomLoadInput) {
+		const res = await fetch('/users.json');
 
-		// if (res.ok) {
-		// const posts = await res.json();
-		const initialPosts = [
-			{
-				title: 'You would never believe what happened to me!',
-				author: 'Charly',
-				createdAt: new Date('2021-08-04T19:09:54.511Z'),
-				content: 'Last night I was playing with Ringo when he suddenly started behaving strangely.'
-			},
-			{
-				title: "I can't stand this dog anymore!",
-				author: 'Ringo',
-				createdAt: new Date('2021-08-04T18:10:00.000Z'),
-				content: 'Please help me get rid of Charly! 😡'
+		if (res.ok) {
+			const { users: initialUsers } = await res.json();
+			const { users } = myFormStore;
+			if (initialUsers) {
+				users.set({
+					ids: initialUsers.map(({ id }) => id),
+					entities: initialUsers
+				});
 			}
-		];
-		const { posts } = myFormStore;
-		posts.set(initialPosts);
+			return {};
+		}
+
+		const { message } = await res.json();
+
+		return {
+			error: new Error(message)
+		};
+	}
+
+	async function loadPosts({ fetch }: CustomLoadInput) {
+		const res = await fetch('/posts.json');
+
+		if (res.ok) {
+			const { posts: initialPosts } = await res.json();
+			const { posts } = myFormStore;
+			if (initialPosts) {
+				posts.set({
+					ids: initialPosts.map(({ id }) => id),
+					entities: initialPosts
+				});
+			}
+			return {};
+		}
+
+		const { message } = await res.json();
+
+		return {
+			error: new Error(message)
+		};
+	}
+
+	export const load: Load = async (loadInput: CustomLoadInput) => {
+		const users = await loadUsers(loadInput);
+		if (users.error) {
+			return users;
+		}
+		const posts = await loadPosts(loadInput);
+		if (posts.error) {
+			return posts;
+		}
 		return {};
-		// }
-
-		// const { message } = await res.json();
-
-		// return {
-		// 	error: new Error(message)
-		// };
 	};
 </script>
 
 <script lang="ts">
+	import { fly } from 'svelte/transition';
+	import { enhance } from '$lib/form';
 	import Post from '$lib/post/Post.svelte';
 
-	const { posts } = myFormStore;
+	const { posts, users } = myFormStore;
+	let title = '';
+	let userId = '';
+	let content = '';
 </script>
 
 <svelte:head>
-	<title>Svelte Social Media Feed</title>
+	<title>Posts - Svelte Social Media Feed</title>
 </svelte:head>
 
+<h1>Add New Post</h1>
+<form
+	action="http://localhost:8080/posts/add"
+	method="POST"
+	autocomplete="off"
+	use:enhance={{
+		result: async (res) => {
+			const { post } = await res.json();
+			if (post) {
+				posts.update(({ entities, ids }) => ({
+					entities: [post, ...entities],
+					ids: [post.id, ...ids]
+				}));
+			}
+
+			title = '';
+			userId = '';
+			content = '';
+		}
+	}}
+>
+	<div class="form-input">
+		<label for="title">Post Title:</label>
+		<input name="title" bind:value={title} placeholder="What's on your mind?" />
+	</div>
+	<div class="form-input">
+		<label for="userId">Author:</label>
+		<div class="form-input--select">
+			<select name="userId" bind:value={userId}>
+				<option value="" />
+				{#each $users.entities as user}
+					<option value={user.id}>{user.username}</option>
+				{/each}
+			</select>
+		</div>
+	</div>
+	<div class="form-input">
+		<label for="content">Description:</label>
+		<textarea name="content" bind:value={content} rows="3" />
+	</div>
+	<button disabled={!title || !userId || !content}>Submit</button>
+</form>
+
 <h1>Posts</h1>
-{#if $posts.length > 0}
-	{#each $posts as post}
-		<Post {...post} />
-	{/each}
+{#if $posts.entities.length > 0}
+	<ul>
+		{#each $posts.entities as post}
+			<li in:fly={{ y: 50 }}>
+				<Post
+					title={post.title}
+					username={$users.entities.find(({ id }) => id === post.userId)?.username}
+					content={post.content}
+					createdAt={post.createdAt}
+				/>
+			</li>
+		{/each}
+	</ul>
 {:else}
 	<p>Did not found any posts.</p>
 {/if}
@@ -57,5 +139,16 @@
 <style>
 	h1 {
 		color: var(--text-color);
+	}
+
+	input,
+	textarea {
+		width: 100%;
+	}
+
+	ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
 	}
 </style>
