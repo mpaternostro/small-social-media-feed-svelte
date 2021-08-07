@@ -1,22 +1,9 @@
 <script context="module" lang="ts">
-	import type { Load, LoadInput } from '@sveltejs/kit';
-	import type { User as UserType } from '$lib/types';
-	import { fly } from 'svelte/transition';
-	import { enhance } from '$lib/form';
+	import type { Load } from '@sveltejs/kit';
+	import type { CustomLoadInput } from '$lib/types';
 	import { myFormStore } from '$lib/stores';
 
-	interface UsersResponse extends Response {
-		json: () => Promise<{
-			users?: UserType[];
-			message?: string;
-		}>;
-	}
-
-	interface UserLoadInput extends LoadInput {
-		fetch: (info: RequestInfo, init?: RequestInit) => Promise<UsersResponse>;
-	}
-
-	export const load: Load = async ({ fetch }: UserLoadInput) => {
+	export const load: Load = async ({ fetch }: CustomLoadInput) => {
 		const res = await fetch('/users.json');
 
 		if (res.ok) {
@@ -40,6 +27,8 @@
 </script>
 
 <script lang="ts">
+	import { fly } from 'svelte/transition';
+	import { enhance } from '$lib/form';
 	import User from '$lib/user/User.svelte';
 
 	const { users } = myFormStore;
@@ -61,8 +50,8 @@
 			const { user } = await res.json();
 			if (user) {
 				users.update(({ entities, ids }) => ({
-					entities: [...entities, user],
-					ids: [...ids, user.id]
+					entities: [user, ...entities],
+					ids: [user.id, ...ids]
 				}));
 			}
 
@@ -83,10 +72,10 @@
 </form>
 
 <h1>Users</h1>
-{#if $users && $users.entities.length > 0}
+{#if $users.entities.length > 0}
 	<ul>
 		{#each $users.entities as user (user.id)}
-			<li in:fly={{ y: 50 }}>
+			<li in:fly={{ y: -50 }}>
 				<User name={user.name} username={user.username} />
 			</li>
 		{/each}
@@ -98,49 +87,6 @@
 <style>
 	h1 {
 		color: var(--text-color);
-	}
-
-	.form-input {
-		display: flex;
-		flex-direction: column;
-		margin-bottom: 1rem;
-	}
-
-	.form-input input {
-		margin-top: 0.5rem;
-		padding: 0.5rem 0.75rem;
-		border-radius: 0.375rem;
-		border: 1px solid #d1d5db;
-		width: 300px;
-		font-size: 0.875rem;
-	}
-
-	.form-input input:hover {
-		border: 1px solid #b5b5b5;
-	}
-
-	.form-input input:focus {
-		outline-offset: -2px;
-		outline: 2px solid transparent;
-		border-color: var(--emerald);
-		box-shadow: inset 0px 0px 1px #313131;
-	}
-
-	button {
-		padding: 0.5rem 1rem;
-		color: white;
-		background-color: var(--blue);
-		border: none;
-		border-radius: 0.375rem;
-	}
-
-	button:hover {
-		background-color: var(--dark-blue);
-	}
-
-	button:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
 	}
 
 	ul {
