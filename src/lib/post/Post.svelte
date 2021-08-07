@@ -1,14 +1,14 @@
 <script lang="ts">
-	import type { Post } from '$lib/types';
+	import type { Post, User } from '$lib/types';
 	export let title: Post['title'];
-	export let author: Post['author'];
+	export let username: User['username'];
 	export let createdAt: Post['createdAt'];
 	export let content: Post['content'];
 </script>
 
 <article>
 	<p class="title">{title}</p>
-	<p class="subtitle"><em>by {author}</em> - {createdAt}</p>
+	<p class="subtitle"><em>by {username}</em> - {createdAt}</p>
 	<p class="subtitle">{content}</p>
 </article>
 

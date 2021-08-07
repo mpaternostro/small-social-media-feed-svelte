@@ -1,10 +1,11 @@
 // this action (https://svelte.dev/tutorial/actions) allows us to
 // progressively enhance a <form> that already works without JS
 
-import type { User } from './types';
+import type { Post, User } from './types';
 
 interface ServerResponse extends Response {
 	json: () => Promise<{
+		post: Post | undefined;
 		user: User | undefined;
 	}>;
 }
