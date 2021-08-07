@@ -17,6 +17,7 @@
 	--dark-blue: #276cda;
 	--column-width: 42rem;
 	--column-margin-top: 4rem;
+	--input-fixed-size: 300px;
 }
 
 body {
@@ -64,6 +65,7 @@ pre {
 }
 
 input,
+textarea,
 button {
 	font-size: inherit;
 	font-family: inherit;
@@ -71,6 +73,91 @@ button {
 
 button:focus:not(:focus-visible) {
 	outline: none;
+}
+
+.form-input {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 1rem;
+}
+
+.form-input input,
+.form-input select,
+.form-input textarea {
+	margin-top: 0.5rem;
+	padding: 0.5rem 0.75rem;
+	border-radius: 0.375rem;
+	border: 1px solid #d1d5db;
+	width: var(--input-fixed-size);
+	font-size: 0.875rem;
+}
+
+.form-input select {
+	cursor: pointer;
+	appearance: none;
+	height: 2.5em;
+}
+
+.form-input--select {
+	display: inline-block;
+	position: relative;
+	width: var(--input-fixed-size);
+}
+
+.form-input--select:after {
+	border: 3px solid transparent;
+	border-radius: 2px;
+	border-right: 0;
+	border-top: 0;
+	content: ' ';
+	display: block;
+	height: 0.5em;
+	margin-top: -0.4375em;
+	pointer-events: none;
+	position: absolute;
+	top: 56%;
+	transform: rotate(-45deg);
+	transform-origin: center;
+	width: 0.5em;
+	border-color: #3273dc;
+	right: 1.125em;
+	z-index: 4;
+}
+
+.form-input--select:hover:after {
+	border-color: black;
+}
+
+.form-input input:hover,
+.form-input select:hover,
+.form-input textarea:hover {
+	border: 1px solid #b5b5b5;
+}
+
+.form-input input:focus,
+.form-input select:focus,
+.form-input textarea:focus {
+	outline-offset: -2px;
+	outline: 2px solid transparent;
+	border-color: var(--emerald);
+	box-shadow: inset 0px 0px 1px #313131;
+}
+
+form button {
+	padding: 0.5rem 1rem;
+	color: white;
+	background-color: var(--blue);
+	border: none;
+	border-radius: 0.375rem;
+}
+
+form button:hover {
+	background-color: var(--dark-blue);
+}
+
+form button:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
 }
 
 @media (min-width: 720px) {

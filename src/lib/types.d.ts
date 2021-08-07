@@ -19,3 +19,15 @@ export interface User {
 	username: string;
 	createdAt: Date;
 }
+
+interface CustomResponse extends Response {
+	json: () => Promise<{
+		users?: User[];
+		posts?: Post[];
+		message?: string;
+	}>;
+}
+
+interface CustomLoadInput extends LoadInput {
+	fetch: (info: RequestInfo, init?: RequestInit) => Promise<CustomResponse>;
+}
