@@ -7,9 +7,10 @@
 		const res = await fetch('/users.json');
 
 		if (res.ok) {
-			const { users: initialUsers } = await res.json();
-			const { users } = myFormStore;
-			if (initialUsers) {
+			const { users: initialApiUsers } = await res.json();
+			if (initialApiUsers) {
+				const initialUsers = initialApiUsers.map(fromUserApiToUser);
+				const { users } = myFormStore;
 				users.set({
 					ids: initialUsers.map(({ id }) => id),
 					entities: initialUsers
@@ -29,9 +30,10 @@
 		const res = await fetch('/posts.json');
 
 		if (res.ok) {
-			const { posts: initialPosts } = await res.json();
-			const { posts } = myFormStore;
-			if (initialPosts) {
+			const { posts: initialApiPosts } = await res.json();
+			if (initialApiPosts) {
+				const initialPosts = initialApiPosts.map(fromPostApiToPost);
+				const { posts } = myFormStore;
 				posts.set({
 					ids: initialPosts.map(({ id }) => id),
 					entities: initialPosts
@@ -64,6 +66,7 @@
 	import { fly } from 'svelte/transition';
 	import { enhance } from '$lib/form';
 	import Post from '$lib/post/Post.svelte';
+	import { fromPostApiToPost, fromUserApiToUser } from '$lib/mappers/mappers';
 
 	const { posts, users } = myFormStore;
 	let title = '';
