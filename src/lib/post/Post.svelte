@@ -1,14 +1,17 @@
 <script lang="ts">
 	import type { Post, User } from '$lib/types';
+	import { formatDistanceToNow } from 'date-fns';
 	export let title: Post['title'];
 	export let username: User['username'];
 	export let createdAt: Post['createdAt'];
 	export let content: Post['content'];
+
+	const dateDistance = formatDistanceToNow(createdAt, { addSuffix: true });
 </script>
 
 <article>
 	<p class="title">{title}</p>
-	<p class="subtitle"><em>by {username}</em> - {createdAt}</p>
+	<p class="subtitle"><em>by {username}</em> - {dateDistance}</p>
 	<p class="subtitle">{content}</p>
 </article>
 

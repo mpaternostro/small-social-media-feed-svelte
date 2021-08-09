@@ -23,10 +23,25 @@ export interface User {
 	createdAt: Date;
 }
 
+export interface APIPost {
+	id: string;
+	title: string;
+	userId: string;
+	createdAt: string;
+	content: string;
+}
+
+export interface APIUser {
+	id: string;
+	name: string;
+	username: string;
+	createdAt: string;
+}
+
 interface CustomResponse extends Response {
 	json: () => Promise<{
-		users?: User[];
-		posts?: Post[];
+		users?: APIUser[];
+		posts?: APIPost[];
 		message?: string;
 	}>;
 }
