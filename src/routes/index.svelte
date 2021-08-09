@@ -21,12 +21,9 @@
 	autocomplete="off"
 	use:enhance={{
 		result: async (res) => {
-			const { post } = await res.json();
-			if (post) {
-				posts.update(({ entities, ids }) => ({
-					entities: [post, ...entities],
-					ids: [post.id, ...ids]
-				}));
+			const { post: apiPost } = await res.json();
+			if (apiPost) {
+				posts.addPost(apiPost);
 			}
 
 			title = '';
@@ -52,7 +49,14 @@
 			</div>
 		</div>
 	{:else}
-		<p>No users found</p>
+		<div class="form-input">
+			<label for="userId">Author:</label>
+			<div class="form-input--select">
+				<select name="userId" bind:value={userId}>
+					<option value="">No users found</option>
+				</select>
+			</div>
+		</div>
 	{/if}
 	<div class="form-input">
 		<label for="content">Description:</label>
