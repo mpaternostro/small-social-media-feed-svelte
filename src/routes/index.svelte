@@ -1,72 +1,8 @@
-<script context="module" lang="ts">
-	import type { Load } from '@sveltejs/kit';
-	import type { CustomLoadInput } from '$lib/types';
-	import { myFormStore } from '$lib/stores';
-
-	async function loadUsers({ fetch }: CustomLoadInput) {
-		const res = await fetch('/users.json');
-
-		if (res.ok) {
-			const { users: initialApiUsers } = await res.json();
-			if (initialApiUsers) {
-				const initialUsers = initialApiUsers.map(fromUserApiToUser);
-				const { users } = myFormStore;
-				users.set({
-					ids: initialUsers.map(({ id }) => id),
-					entities: initialUsers
-				});
-			}
-			return {};
-		}
-
-		const { message } = await res.json();
-
-		return {
-			error: new Error(message)
-		};
-	}
-
-	async function loadPosts({ fetch }: CustomLoadInput) {
-		const res = await fetch('/posts.json');
-
-		if (res.ok) {
-			const { posts: initialApiPosts } = await res.json();
-			if (initialApiPosts) {
-				const initialPosts = initialApiPosts.map(fromPostApiToPost);
-				const { posts } = myFormStore;
-				posts.set({
-					ids: initialPosts.map(({ id }) => id),
-					entities: initialPosts
-				});
-			}
-			return {};
-		}
-
-		const { message } = await res.json();
-
-		return {
-			error: new Error(message)
-		};
-	}
-
-	export const load: Load = async (loadInput: CustomLoadInput) => {
-		const users = await loadUsers(loadInput);
-		if (users.error) {
-			return users;
-		}
-		const posts = await loadPosts(loadInput);
-		if (posts.error) {
-			return posts;
-		}
-		return {};
-	};
-</script>
-
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import { enhance } from '$lib/form';
+	import { myFormStore } from '$lib/stores';
 	import Post from '$lib/post/Post.svelte';
-	import { fromPostApiToPost, fromUserApiToUser } from '$lib/mappers/mappers';
 
 	const { posts, users } = myFormStore;
 	let title = '';
@@ -103,17 +39,21 @@
 		<label for="title">Post Title:</label>
 		<input name="title" bind:value={title} placeholder="What's on your mind?" />
 	</div>
-	<div class="form-input">
-		<label for="userId">Author:</label>
-		<div class="form-input--select">
-			<select name="userId" bind:value={userId}>
-				<option value="" />
-				{#each $users.entities as user}
-					<option value={user.id}>{user.username}</option>
-				{/each}
-			</select>
+	{#if $users.ids.length > 0 && $users.entities}
+		<div class="form-input">
+			<label for="userId">Author:</label>
+			<div class="form-input--select">
+				<select name="userId" bind:value={userId}>
+					<option value="" />
+					{#each $users.ids as userId}
+						<option value={userId}>{$users.entities[userId].username}</option>
+					{/each}
+				</select>
+			</div>
 		</div>
-	</div>
+	{:else}
+		<p>No users found</p>
+	{/if}
 	<div class="form-input">
 		<label for="content">Description:</label>
 		<textarea name="content" bind:value={content} rows="3" />
@@ -122,15 +62,15 @@
 </form>
 
 <h1>Posts</h1>
-{#if $posts.entities.length > 0}
+{#if $posts.ids.length > 0 && $posts.entities && $users.entities}
 	<ul>
-		{#each $posts.entities as post}
+		{#each $posts.ids as postId (postId)}
 			<li in:fly={{ y: 50 }}>
 				<Post
-					title={post.title}
-					username={$users.entities.find(({ id }) => id === post.userId)?.username}
-					content={post.content}
-					createdAt={post.createdAt}
+					title={$posts.entities[postId].title}
+					username={$users.entities[$posts.entities[postId].userId].username}
+					content={$posts.entities[postId].content}
+					createdAt={$posts.entities[postId].createdAt}
 				/>
 			</li>
 		{/each}

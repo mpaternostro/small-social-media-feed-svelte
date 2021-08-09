@@ -1,22 +1,22 @@
-import type { Post, User } from '$lib/types';
+import type { Posts, Users } from '$lib/types';
 import { writable, Writable } from 'svelte/store';
 
 interface PostStore {
 	ids: string[];
-	entities: Post[];
+	entities?: Posts;
 }
 
 interface UserStore {
 	ids: string[];
-	entities: User[];
+	entities?: Users;
 }
 
 class MyFormStore {
 	posts: Writable<PostStore>;
 	users: Writable<UserStore>;
 	constructor() {
-		this.posts = writable({ ids: [], entities: [] });
-		this.users = writable({ ids: [], entities: [] });
+		this.posts = writable({ ids: [], entities: undefined });
+		this.users = writable({ ids: [], entities: undefined });
 	}
 }
 

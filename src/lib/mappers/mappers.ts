@@ -1,15 +1,42 @@
-import type { APIPost, APIUser, Post, User } from '$lib/types';
+import type { APIPost, Post, Posts, APIUser, User, Users } from '$lib/types';
 
-export function fromPostApiToPost(post: APIPost): Post {
+interface PostAccumulator {
+	[key: string]: Post;
+}
+
+interface UserAccumulator {
+	[key: string]: User;
+}
+
+export function fromPostApiToPost(apiPost: APIPost): Post {
 	return {
-		...post,
-		createdAt: new Date(post.createdAt)
+		...apiPost,
+		createdAt: new Date(apiPost.createdAt)
 	};
 }
 
-export function fromUserApiToUser(user: APIUser): User {
+export function fromUserApiToUser(apiUser: APIUser): User {
 	return {
-		...user,
-		createdAt: new Date(user.createdAt)
+		...apiUser,
+		createdAt: new Date(apiUser.createdAt)
+	};
+}
+
+export function reduceApiPostsToPosts(accum: PostAccumulator, currentValue: APIPost): Posts {
+	const post = fromPostApiToPost(currentValue);
+	return {
+		...accum,
+		[post.id]: post
+	};
+}
+
+export function reduceApiUsersToUsers(accum: UserAccumulator, currentValue: APIUser): Users {
+	const user = {
+		...currentValue,
+		createdAt: new Date(currentValue.createdAt)
+	};
+	return {
+		...accum,
+		[user.id]: user
 	};
 }
