@@ -16,11 +16,19 @@ export interface Post {
 	content: string;
 }
 
+export interface Posts {
+	[key: string]: Post;
+}
+
 export interface User {
 	id: string;
 	name: string;
 	username: string;
 	createdAt: Date;
+}
+
+export interface Users {
+	[key: string]: User;
 }
 
 export interface APIPost {
