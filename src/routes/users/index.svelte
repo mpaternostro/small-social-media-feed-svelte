@@ -20,12 +20,9 @@
 	autocomplete="off"
 	use:enhance={{
 		result: async (res) => {
-			const { user } = await res.json();
-			if (user) {
-				users.update(({ entities, ids }) => ({
-					entities: [user, ...entities],
-					ids: [user.id, ...ids]
-				}));
+			const { user: apiUser } = await res.json();
+			if (apiUser) {
+				users.addUser(apiUser);
 			}
 
 			name = '';
