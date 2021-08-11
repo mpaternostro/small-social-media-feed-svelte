@@ -66,7 +66,7 @@
 </form>
 
 <h1>Posts</h1>
-{#if $posts.ids.length > 0 && $posts.entities && $users.entities}
+{#if $posts.ids.length > 0}
 	<ul>
 		{#each $posts.ids as postId (postId)}
 			<li in:fly={{ y: 50 }}>
